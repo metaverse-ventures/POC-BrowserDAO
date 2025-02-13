@@ -325,34 +325,34 @@ def process_files_for_uniqueness(curr_file_id, input_dir, wallet_address):
     # Calculate uniqueness scores
     total_csv_entries = curr_file_csv_data.drop_duplicates().shape[0]
     unique_csv_entries = unique_curr_csv_data.drop_duplicates().shape[0]
-    csv_uniqueness_score = unique_csv_entries / total_csv_entries if total_csv_entries > 0 else None
+    csv_uniqueness_score = unique_csv_entries / total_csv_entries if total_csv_entries > 0 else 0.0
 
     total_json_entries = len({json.dumps(entry, sort_keys=True) for entry in curr_file_json_data})
     unique_json_entries = len({json.dumps(entry, sort_keys=True) for entry in unique_curr_json_data})
-    json_uniqueness_score = unique_json_entries / total_json_entries if total_json_entries > 0 else None
+    json_uniqueness_score = unique_json_entries / total_json_entries if total_json_entries > 0 else 0.0
 
     total_yaml_entries = len({json.dumps(entry, sort_keys=True) for entry in curr_yaml_data})
     unique_yaml_entries = len({json.dumps(entry, sort_keys=True) for entry in unique_curr_yaml_data})
-    yaml_uniqueness_score = unique_yaml_entries / total_yaml_entries if total_yaml_entries > 0 else None
+    yaml_uniqueness_score = unique_yaml_entries / total_yaml_entries if total_yaml_entries > 0 else 0.0
 
     # Determine final uniqueness score
-    final_uniqueness_score = None
-    if csv_uniqueness_score is not None and json_uniqueness_score is not None and yaml_uniqueness_score is not None:
+    final_uniqueness_score = 0.0
+    if csv_uniqueness_score != 0.0 and json_uniqueness_score != 0.0 and yaml_uniqueness_score != 0.0:
         # Normalize based on data volume
         final_uniqueness_score = (
             (csv_uniqueness_score * total_csv_entries) + 
             (json_uniqueness_score * total_json_entries) + 
             (yaml_uniqueness_score * total_yaml_entries)
         ) / (total_csv_entries + total_json_entries + total_yaml_entries)
-    elif csv_uniqueness_score is not None:
+    elif csv_uniqueness_score != 0.0:
         final_uniqueness_score = csv_uniqueness_score
-    elif json_uniqueness_score is not None:
+    elif json_uniqueness_score != 0.0:
         final_uniqueness_score = json_uniqueness_score
-    elif yaml_uniqueness_score is not None:
+    elif yaml_uniqueness_score != 0.0:
         final_uniqueness_score = yaml_uniqueness_score
 
     # Round final uniqueness score to 3 decimal places
-    if final_uniqueness_score is not None:
+    if final_uniqueness_score != 0.0:
         final_uniqueness_score = round(final_uniqueness_score, 3)
 
     # Cache current file data in Redis
