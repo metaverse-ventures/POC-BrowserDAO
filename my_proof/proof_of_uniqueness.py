@@ -45,7 +45,7 @@ def get_file_mappings(wallet_address):
     # if response.status_code == 200:
     #     return response.json()  # Return JSON response
     # else:
-    #     return []  # Return empty list in case of an error
+        # return []  # Return empty list in case of an error
     return [{"fileId":1607662, "fileUrl":"https://drive.google.com/uc?export=download&id=1J3Lux-VZHPfUSMv6Hqh5Zf0iGPOOSsxZ"},
             {"fileId":1607816, "fileUrl":"https://drive.google.com/uc?export=download&id=16xQSjQ1KGNwSJZTA84Ex2v6Z2IGAEDyo"}]
 
@@ -269,7 +269,18 @@ def process_files_for_uniqueness(curr_file_id, input_dir, wallet_address):
         file_path = os.path.join(input_dir, json_file)
         with open(file_path, 'r') as file:
             json_data = json.load(file)
+            
+            # If the JSON data is a list, wrap it in an object with "semanticSegments" as the key
+            if isinstance(json_data, list):
+                json_data = {"semanticSegments": json_data}
+            
             curr_file_json_data.append(json_data)
+        
+        # Overwrite the file with the new format if it was a list
+        with open(file_path, 'w') as file:
+            json.dump(json_data, file, indent=4)
+
+    print("JSON files processed and formatted successfully.")
     
     # Process current input directory HTMLs
     curr_yaml_data = process_html_files(input_dir)
