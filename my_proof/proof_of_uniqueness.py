@@ -46,8 +46,8 @@ def get_file_mappings(wallet_address):
     #     return response.json()  # Return JSON response
     # else:
         # return []  # Return empty list in case of an error
-    return [{"fileId":1607662, "fileUrl":"https://drive.google.com/uc?export=download&id=1J3Lux-VZHPfUSMv6Hqh5Zf0iGPOOSsxZ"},
-            {"fileId":1607816, "fileUrl":"https://drive.google.com/uc?export=download&id=16xQSjQ1KGNwSJZTA84Ex2v6Z2IGAEDyo"}]
+    return [{"fileId":119, "fileUrl":"https://drive.google.com/uc?export=download&id=1J3Lux-VZHPfUSMv6Hqh5Zf0iGPOOSsxZ"},
+            {"fileId":1607848, "fileUrl":"https://drive.google.com/uc?export=download&id=16xQSjQ1KGNwSJZTA84Ex2v6Z2IGAEDyo"}]
 
 # Download and decrypt file
 def download_and_decrypt(file_url, gpg_signature):
@@ -351,6 +351,10 @@ def process_files_for_uniqueness(curr_file_id, input_dir, wallet_address):
     elif yaml_uniqueness_score is not None:
         final_uniqueness_score = yaml_uniqueness_score
 
+    # Round final uniqueness score to 3 decimal places
+    if final_uniqueness_score is not None:
+        final_uniqueness_score = round(final_uniqueness_score, 3)
+
     # Cache current file data in Redis
     if redis_client:
         redis_client.hset(curr_file_id, mapping={
@@ -358,7 +362,6 @@ def process_files_for_uniqueness(curr_file_id, input_dir, wallet_address):
             "location_history_json_data": json.dumps(curr_file_json_data),
             "bookmarks_yaml_data": json.dumps(curr_yaml_data)
         })
-    
     logging.info(f"Current file data stored in Redis under key {curr_file_id}")
     logging.info(f"Unique CSV data: {unique_curr_csv_data}")
     logging.info(f"Unique JSON data: {unique_curr_json_data}")
