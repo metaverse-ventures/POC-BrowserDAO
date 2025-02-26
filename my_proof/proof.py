@@ -89,21 +89,22 @@ class Proof:
 
         mapped_types = set()
         for data_type in data_types_provided:
-            if data_type == "csv":
-                key = "browser_history"
-            elif data_type == "json":
-                key = "location_timeline"
-            elif data_type in ["html", "yaml"]:
-                key = "bookmark_history"
-            else:
+            key_mapping = {"csv": "browser_history", "json": "location_timeline", "html": "bookmark_history", "yaml": "bookmark_history"}
+            key = key_mapping.get(data_type)
+            if not key:
                 continue
-            
+
             mapped_types.add(key)
-            platform_rewards[key] = {
-                "token_reward": TOKEN_MAPPING[key],
+            scores = {
                 "uniqueness": uniqueness_details.get(f"{data_type}_uniqueness_score", 0.0),
                 "quality": quality_n_authenticity_details.get(f"{data_type}_quality_score", 0.0),
-                "authenticity": quality_n_authenticity_details.get(f"{data_type}_authenticity_score", 0.0)
+                "authenticity": quality_n_authenticity_details.get(f"{data_type}_authenticity_score", 0.0),
+                "ownership": proof_response_object['ownership']
+            }
+            platform_rewards[key] = {
+                "token_reward": TOKEN_MAPPING[key],
+                **scores,
+                "score": sum(scores.values()) / len(scores)
             }
 
         proof_response_object["metadata"] = {
