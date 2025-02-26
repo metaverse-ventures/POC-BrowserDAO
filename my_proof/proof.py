@@ -90,7 +90,7 @@ class Proof:
 
         mapped_types = set()
         for data_type in data_types_provided:
-            key_mapping = {"csv": "browser_history", "json": "location_timeline", "html": "bookmark_history", "yaml": "bookmark_history"}
+            key_mapping = {"csv": "browser_history", "json": "location_timeline", "yaml": "bookmark_history"}
             key = key_mapping.get(data_type)
             if not key:
                 continue
