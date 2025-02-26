@@ -15,9 +15,9 @@ CONTRIBUTION_THRESHOLD = 4
 EXTRA_POINTS = 5
 
 TOKEN_MAPPING = {
-    "browser_history": 15,  # maps to csv
-    "bookmark_history": 10,  # maps to html/yaml
-    "location_timeline": 25  # maps to json
+    "browser_history": int(os.environ.get("BROWSER_HISTORY_TOKEN_COUNT", 15)),  # maps to csv
+    "bookmark_history": int(os.environ.get("BOOKMARK_HISTORY_TOKEN_COUNT", 10)),  # maps to html/yaml
+    "location_timeline": int(os.environ.get("LOCATION_TIMELINE_TOKEN_COUNT", 25))  # maps to json
 }
 
 class Proof:
