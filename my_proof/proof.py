@@ -15,8 +15,8 @@ CONTRIBUTION_THRESHOLD = 4
 EXTRA_POINTS = 5
 
 TOKEN_MAPPING = {
-    "browser_history": 10,  # maps to csv
-    "bookmark_history": 15,  # maps to html/yaml
+    "browser_history": 15,  # maps to csv
+    "bookmark_history": 10,  # maps to html/yaml
     "location_timeline": 25  # maps to json
 }
 
@@ -42,6 +42,10 @@ class Proof:
 
     def calculate_total_tokens(self, platform_rewards):
         return sum(reward["token_reward"] for reward in platform_rewards.values())
+
+    def calculate_final_score(self, total_tokens):
+        max_possible_tokens = sum(TOKEN_MAPPING.values())
+        return total_tokens / max_possible_tokens if max_possible_tokens > 0 else 0.0
 
     def generate(self) -> ProofResponse:
         """Generate proofs for all input files."""
@@ -84,9 +88,6 @@ class Proof:
             if proof_response_object['authenticity'] < 1.0:
                 proof_response_object['valid'] = True
 
-            proof_response_object['score'] = 1.0
-            # self.calculate_final_score(proof_response_object)
-
         mapped_types = set()
         for data_type in data_types_provided:
             key_mapping = {"csv": "browser_history", "json": "location_timeline", "html": "bookmark_history", "yaml": "bookmark_history"}
@@ -95,6 +96,9 @@ class Proof:
                 continue
 
             mapped_types.add(key)
+            uniqueness_percentage = uniqueness_details.get(f"{data_type}_uniqueness_score", 0.0)
+            token_reward = TOKEN_MAPPING[key] * uniqueness_percentage
+
             scores = {
                 "uniqueness": uniqueness_details.get(f"{data_type}_uniqueness_score", 0.0),
                 "quality": quality_n_authenticity_details.get(f"{data_type}_quality_score", 0.0),
@@ -102,17 +106,19 @@ class Proof:
                 "ownership": proof_response_object['ownership']
             }
             platform_rewards[key] = {
-                "token_reward": TOKEN_MAPPING[key],
+                "token_reward": token_reward,
                 **scores,
                 "score": sum(scores.values()) / len(scores)
             }
 
+        total_tokens = self.calculate_total_tokens(platform_rewards)
         proof_response_object["metadata"] = {
             "submission_time": datetime.now().isoformat(),
-            "total_tokens": self.calculate_total_tokens(platform_rewards),
+            "total_tokens": total_tokens,
             "types": list(mapped_types),
             "platform_rewards": platform_rewards
         }
 
+        proof_response_object['score'] = self.calculate_final_score(total_tokens)
         logging.info(f"Proof response: {proof_response_object}")
         return proof_response_object
