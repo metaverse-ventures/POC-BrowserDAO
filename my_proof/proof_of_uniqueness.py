@@ -33,21 +33,21 @@ def get_redis_client():
 # Fetch file mappings from API
 # TODO: Remove comments
 def get_file_mappings(wallet_address):
-    validator_base_api_url = os.environ.get('VALIDATOR_BASE_API_URL')
-    endpoint = "/api/userinfo"
-    url = f"{validator_base_api_url.rstrip('/')}{endpoint}"
+    # validator_base_api_url = os.environ.get('VALIDATOR_BASE_API_URL')
+    # endpoint = "/api/userinfo"
+    # url = f"{validator_base_api_url.rstrip('/')}{endpoint}"
 
-    payload = {"walletAddress": wallet_address}  # Send walletAddress in the body
-    headers = {"Content-Type": "application/json"}  # Set headers for JSON request
+    # payload = {"walletAddress": wallet_address}  # Send walletAddress in the body
+    # headers = {"Content-Type": "application/json"}  # Set headers for JSON request
 
-    response = requests.post(url, json=payload, headers=headers)  # Make POST request
+    # response = requests.post(url, json=payload, headers=headers)  # Make POST request
 
-    if response.status_code == 200:
-        return response.json()  # Return JSON response
-    else:
-        return []  # Return empty list in case of an error
-    # return [{"fileId":119, "fileUrl":"https://drive.google.com/uc?export=download&id=1J3Lux-VZHPfUSMv6Hqh5Zf0iGPOOSsxZ"},
-    #         {"fileId":1607848, "fileUrl":"https://drive.google.com/uc?export=download&id=16xQSjQ1KGNwSJZTA84Ex2v6Z2IGAEDyo"}]
+    # if response.status_code == 200:
+    #     return response.json()  # Return JSON response
+    # else:
+    #     return []  # Return empty list in case of an error
+    return [{"fileId":119, "fileUrl":"https://drive.google.com/uc?export=download&id=1J3Lux-VZHPfUSMv6Hqh5Zf0iGPOOSsxZ"},
+            {"fileId":1607848, "fileUrl":"https://drive.google.com/uc?export=download&id=16xQSjQ1KGNwSJZTA84Ex2v6Z2IGAEDyo"}]
 
 # Download and decrypt file
 def download_and_decrypt(file_url, gpg_signature):
@@ -376,5 +376,8 @@ def process_files_for_uniqueness(curr_file_id, input_dir, wallet_address):
         "curr_csv_data": curr_file_csv_data,
         "curr_json_data": curr_file_json_data,
         "curr_yaml_data": curr_yaml_data,
-        "uniqueness_score": final_uniqueness_score
+        "uniqueness_score": final_uniqueness_score,
+        "csv_uniqueness_score": csv_uniqueness_score if total_csv_entries > 0 else 0.0,
+        "json_uniqueness_score": json_uniqueness_score if total_json_entries > 0 else 0.0,
+        "yaml_uniqueness_score": yaml_uniqueness_score if total_yaml_entries > 0 else 0.0
     }
